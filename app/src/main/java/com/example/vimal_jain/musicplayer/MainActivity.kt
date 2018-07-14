@@ -10,13 +10,26 @@ import android.view.Menu
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import android.net.Uri;
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.widget.ListView;
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+    private val songsList: MutableList<Songs>? = null
+    private val songsView: ListView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        val songsView = findViewById<ListView>(R.id.song_list)
+
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -29,6 +42,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+
+        getSongList()
     }
 
     override fun onBackPressed() {
@@ -60,8 +75,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         when (item.itemId) {
             R.id.nav_songs -> {
 
-                setContentView(R.layout.ic_menu_songs)
-
             }
             R.id.nav_artists -> {
 
@@ -85,4 +98,36 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
+
+    fun getSongList() {
+
+        val musicResolver = contentResolver
+        val musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        val musicCursor = musicResolver.query(musicUri, null, null, null, null)
+        val i=0
+
+        if (musicCursor != null && musicCursor.moveToFirst()) {
+            //get columns
+            val titleColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE)
+            val idColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID)
+            val artistColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media.ARTIST)
+            //add songs to list
+            do {
+                i++
+                val thisId = musicCursor.getLong(idColumn)
+                val thisTitle = musicCursor.getString(titleColumn)
+                val thisArtist = musicCursor.getString(artistColumn)
+
+                val temp = new Songs(thisId)
+                temp.title=thisTitle
+                temp.artist=thisArtist
+
+                songsList.add()
+
+            } while (musicCursor.moveToNext())
+        }
+
+        i=0
+    }
+
 }
