@@ -1,5 +1,6 @@
 package com.example.vimal_jain.musicplayer
 
+import java.util.*
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
@@ -21,7 +22,7 @@ import android.widget.ListView;
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private val songsList: MutableList<Songs>? = null
-    private val songsView: ListView? = null
+    private var SongsView: ListView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +30,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setSupportActionBar(toolbar)
 
         val songsView = findViewById<ListView>(R.id.song_list)
+
+        val songsList : MutableList<Songs> = ArrayList()
 
 
         fab.setOnClickListener { view ->
@@ -44,6 +47,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         nav_view.setNavigationItemSelectedListener(this)
 
         getSongList()
+
+        songsList.sortBy { songsList.artist }
     }
 
     override fun onBackPressed() {
@@ -104,7 +109,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val musicResolver = contentResolver
         val musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val musicCursor = musicResolver.query(musicUri, null, null, null, null)
-        val i=0
 
         if (musicCursor != null && musicCursor.moveToFirst()) {
             //get columns
@@ -113,7 +117,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val artistColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media.ARTIST)
             //add songs to list
             do {
-                i++
                 val thisId = musicCursor.getLong(idColumn)
                 val thisTitle = musicCursor.getString(titleColumn)
                 val thisArtist = musicCursor.getString(artistColumn)
@@ -122,12 +125,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 temp.title=thisTitle
                 temp.artist=thisArtist
 
-                songsList.add()
+                if (songsList != null) {
+                    songsList.add(temp)
+                }
 
             } while (musicCursor.moveToNext())
         }
 
-        i=0
-    }
 
+    }
 }
